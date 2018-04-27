@@ -9,7 +9,7 @@ MEMORY {
   ram (rwx)     : org = ORIGIN(sram1), l = LENGTH(sram1) + LENGTH(sram2) + LENGTH(sram3)
 }
 
-ENTRY(main)
+ENTRY(start)
 
 stack_size = 2048;
 heap_size = 1024;
