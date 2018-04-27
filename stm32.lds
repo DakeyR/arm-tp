@@ -5,9 +5,18 @@ MEMORY {
   sram3 (rwx)   : org = 0x20020000, l = 64K
   flash (rwx)   : org = 0x08000000, l = 2M
   bkpsram (rwx) : org = 0x40024000, l = 4K
+
+  ram (rwx)     : org = ORIGIN(sram1), l = LENGTH(sram1) + LENGTH(sram2) + LENGTH(sram3)
 }
 
 ENTRY(main)
+
+stack_size = 2048;
+heap_size = 1024;
+
+_stack_start = ORIGIN(ram) + LENGTH(ram);
+_stack_end = _stack_start - stack_size;
+
 
 SECTIONS {
   /* Contains SP/PC and the interrupt handlers table */
@@ -20,4 +29,12 @@ SECTIONS {
     *(.text)
     . = ALIGN(4);
   } > flash
+
+  .heap :
+  {
+    . = ALIGN(4);
+    _heap_start = .;
+    . = . + heap_size;
+    _heap_end = .;
+  } > ram
 }
