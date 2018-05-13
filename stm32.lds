@@ -21,6 +21,7 @@ _stack_end = _stack_start - stack_size;
 SECTIONS {
   /* Contains SP/PC and the interrupt handlers table */
   .isr_vector : {
+    . = ALIGN(4);
     KEEP(*(.isr_vector))
   } > flash
 
