@@ -7,8 +7,8 @@ SRC = $(wildcard src/*.c)
 OBJS = $(SRC:.c=.o)
 
 
-CFLAGS = -mcpu=cortex-m4 -nostartfiles #, -gc-sections -Map=obj.map
-LDFLAGS = -T stm32.lds
+CFLAGS = -ffunction-sections  -mcpu=cortex-m4 -nostartfiles -g #, -gc-sections -Map=obj.map
+LDFLAGS = -T stm32.lds -gc-sections
 
 .PHONY: all clean
 
