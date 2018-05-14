@@ -1,13 +1,24 @@
-CC = arm-none-eabi-gcc
-LD = arm-none-eabi-ld
+TOOLCHAIN = arm-none-eabi
+
+CC = ${TOOLCHAIN}-gcc
+LD = ${TOOLCHAIN}-ld
 
 SRC = $(wildcard src/*.c)
 OBJS = $(SRC:.c=.o)
 
 
-.PHONY: all
+CFLAGS = -mcpu=cortex-m4 -nostartfiles #, -gc-sections -Map=obj.map
+LDFLAGS = -T stm32.lds
 
-all: stm32.out
+.PHONY: all clean
 
-stm32.out: $(OBJS)
-	$(LD) -T stm32.lds $(OBJS) -o $@
+all: stm32.bin
+
+clean:
+	$(RM) $(OBJS) stm32.out
+
+stm32.elf: $(OBJS) stm32.lds
+	$(LD) $(LDFLAGS) $(OBJS) -o $@
+
+stm32.bin: stm32.elf
+	$(TOOLCHAIN)-objcopy -O binary -S $< $@

@@ -31,8 +31,23 @@ SECTIONS {
     . = ALIGN(4);
   } > flash
 
-  .heap :
-  {
+  .data : {
+    _data_start = .;
+    *(.data);
+    . = ALIGN(4);
+    _data_end = .;
+  } > ram AT > flash
+  _data_loadaddr = LOADADDR(.data);
+
+  .bss : {
+    _bss = .;
+    *(.bss*)
+    *(COMMON)
+    . = ALIGN(4);
+    _bss_end = .;
+  }
+
+  .heap(NOLOAD) : {
     . = ALIGN(4);
     _heap_start = .;
     . = . + heap_size;
