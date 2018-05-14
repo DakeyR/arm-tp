@@ -40,7 +40,7 @@ SECTIONS {
   _data_loadaddr = LOADADDR(.data);
 
   .bss : {
-    _bss = .;
+    _bss_start = .;
     *(.bss*)
     *(COMMON)
     . = ALIGN(4);
