@@ -53,6 +53,21 @@ d'exceptions.
 
 `st info --probe` -> infos sur le device
 `st flash` -> flasher
+  `st-flash write mon.bin 0x08000000`
 `st util` -> pour se connecter + gdb (`arm-none-eabi-gdb`)
 
+## GPIO
 
+- Reference manual tells on which port what is plugged
+- One pin can be configured to be used in read or write mode (input or output)
+  - By default it is in read mode (input)
+  - To read data -> GPIOx_IDR
+  - To write data -> GPIOx_ODR
+- To access the GPIO's register:
+  - Memory map tells the base address for the GPIOx registers
+  - Register maps tells the offset from the base address.
+
+Presh button -> PA0 (GPIOA_IDR0 to get the state)
+- Base Addr: 0x4002 0000
+- Limit : 0x4002 03FF
+- IDR: Offset = 0x10
