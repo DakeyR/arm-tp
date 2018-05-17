@@ -58,6 +58,9 @@ d'exceptions.
 
 ## GPIO
 
+Par défaut, tout est en mode reset, les GPIOs sont désactivés.
+-> il faut les activer avec le RCC (Reset...)
+
 - Reference manual tells on which port what is plugged
 - One pin can be configured to be used in read or write mode (input or output)
   - By default it is in read mode (input)
