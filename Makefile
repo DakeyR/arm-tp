@@ -11,12 +11,15 @@ CFLAGS = -ffunction-sections  -mcpu=cortex-m4 -nostartfiles -g #, -gc-sections -
 LDFLAGS = -T stm32.lds -gc-sections
 
 
-.PHONY: all clean
+.PHONY: all clean flash
 
 all: stm32.bin
 
 clean:
 	$(RM) $(OBJS) stm32.out
+
+flash: stm32.bin
+	st-flash write $< 0x08000000
 
 
 stm32.elf: $(OBJS) stm32.lds
