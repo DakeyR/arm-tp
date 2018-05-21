@@ -1,6 +1,9 @@
 #include <stdint.h>
 
 #include "board.h"
+#include "interrupt_handlers.h"
+
+extern const void *_isr_vector[82];
 
 
 void button_pressed(void)
@@ -11,6 +14,9 @@ void button_pressed(void)
 
 void main(void)
 {
+
+    _isr_vector[22] = button_handler;
+
     GPIO_ENABLE(A);
     GPIO_ENABLE(G);
 
