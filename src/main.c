@@ -14,8 +14,15 @@ void button_pressed(void)
 
 void main(void)
 {
+    GET_REG(SYSCFG_EXTICR1) |=  0x0000;
+    GET_REG(EXTI_IMR) |= 0x1;
+    GET_REG(EXTI_FTSR) |= 0x1;
+    GET_REG(EXTI_RTSR) |= 0x1;
 
-    _isr_vector[22] = button_handler;
+    REG_SET_BIT(NVIC_ISER0, 0x6);
+
+    __asm__ __volatile__ ("cpsie i");
+
 
     GPIO_ENABLE(A);
     GPIO_ENABLE(G);
@@ -23,7 +30,7 @@ void main(void)
     GPIO_SET_PIN_MODE(G, 13, GPIO_PIN_MODE_OUTPUT);
 
     // Turn on LED
-    GET_REG(GPIO_G_ODR) |= 0x1 << 13;
+    //GET_REG(GPIO_G_ODR) |= 0x1 << 13;
 
     while (1)
         if (GET_REG(GPIO_A_IDR) & 0x0001)
