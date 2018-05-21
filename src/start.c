@@ -24,7 +24,7 @@ void start(void)
     // memcpy(_data_start, _data_loadaddr, _data_end - _data_start);
     uint32_t *data_src = &_data_loadaddr;
     uint32_t *data_dst = &_data_start;
-    while (data_src < &_data_loadaddr + ((int)&_data_end - (int)&_data_start))
+    while (data_dst < &_data_end)
         *(data_dst++) = *(data_src++);
 
 
