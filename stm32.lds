@@ -33,7 +33,7 @@ SECTIONS {
 
   .data : {
     _data_start = .;
-    *(.data);
+    *(.data.*);
     . = ALIGN(4);
     _data_end = .;
   } > ram AT > flash

@@ -7,8 +7,13 @@ SRC = $(wildcard src/*.c)
 OBJS = $(SRC:.c=.o)
 
 
-CFLAGS = -ffunction-sections  -mcpu=cortex-m4 -nostartfiles -g #, -gc-sections -Map=obj.map
-LDFLAGS = -T stm32.lds -gc-sections
+CFLAGS = -mcpu=cortex-m4 -nostartfiles -static -g
+LDFLAGS = -T stm32.lds
+
+
+# GC symbols
+CFLAGS += -fdata-sections -ffunction-sections
+LDFLAGS += -gc-sections # -print-gc-sections
 
 
 .PHONY: all clean flash
