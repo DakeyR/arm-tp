@@ -16,7 +16,7 @@ CFLAGS += -fdata-sections -ffunction-sections
 LDFLAGS += -gc-sections # -print-gc-sections
 
 
-.PHONY: all clean flash
+.PHONY: all clean debug flash
 
 all: stm32.bin
 
@@ -25,6 +25,10 @@ clean:
 
 flash: stm32.bin
 	st-flash write $< 0x08000000
+
+debug:
+	@nohup st-util >/dev/null 2>&1 &
+	@$(TOOLCHAIN)-gdb $< -quiet -ex 'target remote :4242' -b main
 
 
 stm32.elf: $(OBJS) stm32.lds
