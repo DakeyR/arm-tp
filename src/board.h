@@ -1,5 +1,10 @@
 #pragma once
+
 #include <stdint.h>
+
+
+#define N_INTERRUPTS 92
+
 
 #define REG_NAME(Name) \
         _REG_ ##Name

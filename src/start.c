@@ -1,20 +1,9 @@
 #include <stdint.h>
+#include "interrupt_handlers.h"
 
-extern const void *_stack_start;
 
-extern void button_handler();
 extern uint32_t _bss_start, _bss_end, _data_start, _data_end, _data_loadaddr;
 extern void main(void);
-
-void start(void);
-
-
-const void *_isr_vector[82] __attribute__((section (".isr_vector"))) = {
-    &_stack_start,
-    start,
-    0x0,
-    [22] = button_handler
-};
 
 
 void start(void)
@@ -32,5 +21,7 @@ void start(void)
 
     main();
 
-    // TODO: handle returning main
+
+    for (;;)
+        continue;
 }

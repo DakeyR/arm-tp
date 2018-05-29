@@ -3,17 +3,16 @@
 #include "board.h"
 #include "interrupt_handlers.h"
 
-extern const void *_isr_vector[82];
 
-
-void button_pressed(void)
+void button_pressed(irq_num_t n)
 {
-    while (1)
-        ;
+    GET_REG(GPIO_G_ODR) ^= 1 << 13;
 }
+
 
 void main(void)
 {
+    // TODO: Generic interrupt enabling
     GET_REG(SYSCFG_EXTICR1) |=  0x0000;
     GET_REG(EXTI_IMR) |= 0x1;
     GET_REG(EXTI_FTSR) |= 0x1;
@@ -24,15 +23,11 @@ void main(void)
     __asm__ __volatile__ ("cpsie i");
 
 
-    GPIO_ENABLE(A);
     GPIO_ENABLE(G);
-
     GPIO_SET_PIN_MODE(G, 13, GPIO_PIN_MODE_OUTPUT);
 
-    // Turn on LED
-    //GET_REG(GPIO_G_ODR) |= 0x1 << 13;
+    on_interrupt(6, button_pressed);
 
     while (1)
-        if (GET_REG(GPIO_A_IDR) & 0x0001)
-            button_pressed();
+        continue;
 }

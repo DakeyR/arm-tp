@@ -11,18 +11,24 @@ MEMORY {
 
 ENTRY(start)
 
-stack_size = 2048;
-heap_size = 1024;
+PROVIDE(stack_size = 2048);
+PROVIDE(heap_size = 1024);
 
 _stack_start = ORIGIN(ram) + LENGTH(ram);
 _stack_end = _stack_start - stack_size;
 
 
 SECTIONS {
-  /* Contains SP/PC and the interrupt handlers table */
+  .sp : {
+    LONG(ORIGIN(ram) + LENGTH(ram))
+  } > flash
+
   .isr_vector : {
-    . = ALIGN(4);
-    KEEP(*(.isr_vector))
+    KEEP(*(SORT(.isr_vector.exceptions.*)))
+    . = ALIGN(16 * 4);
+
+    KEEP(*(SORT(.isr_vector.interrupts.*)))
+    . = ALIGN(_N_INTERRUPTS * 4);
   } > flash
 
   .text : {
@@ -32,6 +38,7 @@ SECTIONS {
   } > flash
 
   .data : {
+    . = ALIGN(4);
     _data_start = .;
     *(.data.*);
     . = ALIGN(4);
@@ -47,7 +54,7 @@ SECTIONS {
     _bss_end = .;
   }
 
-  .heap(NOLOAD) : {
+  .heap (NOLOAD) : {
     . = ALIGN(4);
     _heap_start = .;
     . = . + heap_size;
