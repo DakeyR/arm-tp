@@ -74,3 +74,19 @@ Presh button -> PA0 (GPIOA_IDR0 to get the state)
 - Base Addr: 0x4002 0000
 - Limit : 0x4002 03FF
 - IDR: Offset = 0x10
+
+## UART
+
+0x4001 1000 - 0x4001 13FF -> USART1 -> PA9 (TX) - PA10 (RX) (Bus APB2)
+
+Section 30.6.8: USART register map on page 1021
+
+0x4001 1400 - 0x4001 17FF -> USART6
+0x4000 4C00 - 0x4000 4FFF -> UART4
+0x4000 7C00 - 0x4000 7FFF -> UART8
+0x4000 7800 - 0x4000 7BFF -> UART7
+
+## Clock
+
+By default, HSI is ON (in RCC_CR)
+We need to enable USART1 in RCC_APBENR
