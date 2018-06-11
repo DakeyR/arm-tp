@@ -28,6 +28,8 @@ void main(void)
 
     on_interrupt(6, button_pressed);
 
+    GET_REG(RCC_APB2ENR) |= 0x10;
+
     while (1)
         continue;
 }
