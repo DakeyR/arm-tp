@@ -13,12 +13,12 @@ void button_pressed(irq_num_t n)
 void main(void)
 {
     // TODO: Generic interrupt enabling
-    GET_REG(SYSCFG_EXTICR1) |=  0x0000;
-    GET_REG(EXTI_IMR) |= 0x1;
-    GET_REG(EXTI_FTSR) |= 0x1;
-    GET_REG(EXTI_RTSR) |= 0x1;
+    REG_CLR_BIT(SYSCFG_EXTICR1, 0);
+    REG_SET_BIT(EXTI_IMR, 0);
+    REG_SET_BIT(EXTI_FTSR, 0);
+    REG_SET_BIT(EXTI_RTSR, 0);
 
-    REG_SET_BIT(NVIC_ISER0, 0x6);
+    REG_SET_BIT(NVIC_ISER0, 6);
 
     __asm__ __volatile__ ("cpsie i");
 
