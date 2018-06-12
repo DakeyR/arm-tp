@@ -26,9 +26,9 @@ clean:
 flash: stm32.bin
 	st-flash write $< 0x08000000
 
-debug:
+debug: stm32.elf
 	@nohup st-util >/dev/null 2>&1 &
-	@$(TOOLCHAIN)-gdb $< -quiet -ex 'target remote :4242' -b main
+	@$(TOOLCHAIN)-gdb $< -quiet -ex 'target remote :4242' -ex 'b main'
 
 
 stm32.elf: $(OBJS) stm32.lds
