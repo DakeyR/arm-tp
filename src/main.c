@@ -13,10 +13,20 @@ void button_pressed(irq_num_t n)
 
 void main(void)
 {
+    GPIO_ENABLE(A);
+
+    GPIO_SET_PIN_MODE(A,  9, GPIO_PIN_MODE_ALTERNATE);
+    GPIO_SET_PIN_MODE(A, 10, GPIO_PIN_MODE_ALTERNATE);
+
+    // Set PA9 and PA10 to alternate mode AF7
+    GET_REG(GPIO_A_AFRH) |= 7 << (( 9 - 8) * 4);
+    GET_REG(GPIO_A_AFRH) |= 7 << ((10 - 8) * 4);
+
     REG_SET_BIT(RCC_APB2ENR, 4); // USART1 clock enable
 
     // GET_REG(USART1_BRR) = (/* mantissa */ 8 << 4) | (/* frac */ 11); // 115200 bps
-    GET_REG(USART1_BRR) = (/* mantissa */ 416 << 4) | (/* frac */ 11); // 9600 bps
+    // GET_REG(USART1_BRR) = (/* mantissa */ 104 << 4) | (/* frac */ 3); // 9600 bps
+    GET_REG(USART1_BRR) = (/* mantissa */ 416 << 4) | (/* frac */ 11); // 2400 bps
 
     REG_SET_BIT(USART1_CR1, 13); // USART1 enable
 
