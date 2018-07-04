@@ -55,7 +55,7 @@ void uart_send(const char *buf, size_t n)
     {
         GET_REG(USART1_DR) = *(buf++);
 
-        while (REG_GET_BIT(USART1_SR, 7)) // TXE: Transmit data register empty
+        while (!REG_GET_BIT(USART1_SR, 7)) // TXE: Transmit data register empty
             continue;
     }
 

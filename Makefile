@@ -3,9 +3,10 @@ TOOLCHAIN = arm-none-eabi
 CC = ${TOOLCHAIN}-gcc
 LD = ${TOOLCHAIN}-ld
 
-SRC = $(wildcard src/*.c)
+SRC = $(shell find src -name '*.c')
 OBJS = $(SRC:.c=.o)
 
+CPPFLAGS = -iquote src
 
 CFLAGS = -mcpu=cortex-m4 -nostartfiles -static -g
 LDFLAGS = -T stm32.lds
