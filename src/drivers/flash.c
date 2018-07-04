@@ -2,14 +2,10 @@
 #include "flash.h"
 
 
-#define KEY1 0x45670123
-#define KEY2 0xCDEF89AB
-
-
 void flash_unlock(void)
 {
-    GET_REG(FLASH_KEYR) = KEY1;
-    GET_REG(FLASH_KEYR) = KEY2;
+    GET_REG(FLASH_KEYR) = FLASH_KEY1;
+    GET_REG(FLASH_KEYR) = FLASH_KEY2;
 }
 
 void flash_lock(void)
@@ -19,7 +15,8 @@ void flash_lock(void)
 
 void flash_erase(unsigned char sector)
 {
-    // 0 <= sector < 24
+    // assert(0 <= sector);
+    // assert(sector < FLASH_SECTORS);
 
     while (REG_GET_BIT(FLASH_SR, 16)) // BSY
         continue;
@@ -35,4 +32,23 @@ void flash_erase(unsigned char sector)
 
     while (REG_GET_BIT(FLASH_SR, 16))
         continue;
+}
+
+void flash_write(char *dst, const char *src, size_t n)
+{
+    // assert(&_flash_start <= dst);
+    // assert(dst + n < &_flash_end);
+
+    while (REG_GET_BIT(FLASH_SR, 16)) // BSY
+        continue;
+
+    while (n--)
+    {
+        REG_SET_BIT(FLASH_CR, 0); // PG
+
+        *(dst++) = *(src++);
+
+        while (REG_GET_BIT(FLASH_SR, 16)) // BSY
+            continue;
+    }
 }
