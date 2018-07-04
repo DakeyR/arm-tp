@@ -22,6 +22,11 @@ void main(void)
     GET_REG(GPIO_A_AFRH) |= 7 << (( 9 - 8) * 4);
     GET_REG(GPIO_A_AFRH) |= 7 << ((10 - 8) * 4);
 
+    // REG_SET_BIT(GPIO_A_PUPDR, 18); // PA9 Pull-up
+    REG_SET_BIT(GPIO_A_PUPDR, 19); // PA9 Pull-down
+    REG_SET_BIT(GPIO_A_PUPDR, 20); // PA10 Pull-up
+    // REG_SET_BIT(GPIO_A_PUPDR, 21); // PA10 Pull-down
+
     REG_SET_BIT(RCC_APB2ENR, 4); // USART1 clock enable
 
     // GET_REG(USART1_BRR) = (/* mantissa */ 8 << 4) | (/* frac */ 11); // 115200 bps
@@ -31,7 +36,8 @@ void main(void)
     REG_SET_BIT(USART1_CR1, 13); // USART1 enable
 
     const char buf[] = "Hello, World!\r\n";
-    uart_send(buf, sizeof(buf));
+    while (1)
+        uart_send(buf, sizeof(buf));
 
     while (1)
         continue;
