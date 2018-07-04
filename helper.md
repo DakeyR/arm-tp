@@ -90,3 +90,41 @@ Section 30.6.8: USART register map on page 1021
 
 By default, HSI is ON (in RCC_CR)
 We need to enable USART1 in RCC_APBENR
+
+## Flash Memory
+
+**Registers**
+
+0x4002 3C00 - 0x4002 3FFF -> Flash Interface Register (Section 3.9)
+
+FLASH\_KEYR : Offset 0x04
+FLASH\_SR : Offset 0x0C
+FLASH\_CR : Offset 0x10
+
+**Unlocking the Flash Control Register (3.6.1)**
+
+(After reset -> Write not allowed in FLASH\_CR)
+1. Write KEY1=0x45670123 in the Flash key register (FLASH\_KEYR)
+2. Write KEY2=0xCDEF89AB in the Flash key register (FLASH\_KEYR)
+
+FLASH\_CR can be locked again by setting LOCK bit.
+
+*The FLASH\_CR register is not accessible in write mode when the BSY bit in the FLASH\_SR
+register is set. Any attempt to write to it with the BSY bit set will cause the AHB bus to stall
+until the BSY bit is cleared.*
+
+**Programming (3.6.4)**
+
+1. Check that no main Flash memory operation is ongoing by checking BSY in FLASH\_SR
+2. Set PG bit in FLASH\_CR
+3. Perform data write operations :
+  - byte access in case of x8 parallelism.
+  - half-word access in case of x16 parallelism
+  - word access in case of x32 parallelism
+  - Double world access in case of x64 parallelism.
+4. Wait for BSY to be cleared.
+
+*Successive write operations are possible without the need of an erase operation when
+changing bits from ‘1’ to ‘0’. Writing ‘1’ requires a Flash memory erase operation.
+If an erase and a program operation are requested simultaneously, the erase operation is
+performed first.*
