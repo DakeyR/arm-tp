@@ -27,6 +27,14 @@
 #define REG_CLR_BIT(RegName, Bit) \
         GET_REG(RegName) &= ~(1 << (Bit))
 
+// Reg[Beg:End] = Val[0:End-Beg+1]
+// Reg[End] is included
+#define REG_PUT_BITS(RegName, Beg, End, Val) \
+        GET_REG(RegName) = ( \
+                (GET_REG(RegName) & ~(((1 << ((End) + 1)) - 1) & ~((1 << (Beg)) - 1))) \
+              | (((Val) << (Beg)) &  (((1 << ((End) + 1)) - 1) & ~((1 << (Beg)) - 1))) \
+        )
+
 
 #define DECLARE_GPIO(Name) \
         DECLARE_REGISTER(GPIO_ ##Name## _MODER  ); \
@@ -96,6 +104,15 @@ DECLARE_REGISTER(EXTI_RTSR);
 DECLARE_REGISTER(EXTI_PR);
 DECLARE_REGISTER(NVIC_ISER0);
 DECLARE_REGISTER(NVIC_ICPR0);
+
+
+DECLARE_REGISTER(FLASH_ACR);
+DECLARE_REGISTER(FLASH_KEYR);
+DECLARE_REGISTER(FLASH_OPTKEYR);
+DECLARE_REGISTER(FLASH_SR);
+DECLARE_REGISTER(FLASH_CR);
+DECLARE_REGISTER(FLASH_OPTCR);
+DECLARE_REGISTER(FLASH_OPTCR1);
 
 
 DECLARE_REGISTER(USART1_SR);
