@@ -1,14 +1,30 @@
+#include <stddef.h>
 #include <stdint.h>
 
 #include "board.h"
+#include "drivers/flash.h"
+#include "drivers/uart.h"
 #include "interrupt_handlers.h"
-#include "uart.h"
 
 
-void button_pressed(irq_num_t n)
+#define STR(X) #X
+const float REFLASH_VERSION = 0.1;
+
+typedef struct
 {
-    GET_REG(GPIO_G_ODR) ^= 1 << 13;
-}
+    uint8_t version;
+    uint32_t prog_len;
+    uint32_t chunk_size;
+} header_t;
+
+// Receive n bytes into buf via UART.
+// The goal is to pair this function with a send on the PC side that sends
+// a 32-bit checksum, and then the data, ensuring data integrity.
+void reflash_board_recv(void *buf, size_t n);
+
+// Send the error via UART in a way that the PC program can recognize, and then
+// loop forever to "stop" execution on the board.
+void reflash_board_fatal(const char *error_msg);
 
 
 void main(void)
@@ -23,41 +39,71 @@ void main(void)
     GET_REG(GPIO_A_AFRH) |= 7 << ((10 - 8) * 4);
 
     // REG_SET_BIT(GPIO_A_PUPDR, 18); // PA9 Pull-up
-    REG_SET_BIT(GPIO_A_PUPDR, 19); // PA9 Pull-down
-    REG_SET_BIT(GPIO_A_PUPDR, 20); // PA10 Pull-up
+    // REG_SET_BIT(GPIO_A_PUPDR, 19); // PA9 Pull-down
+
+    // REG_SET_BIT(GPIO_A_PUPDR, 20); // PA10 Pull-up
     // REG_SET_BIT(GPIO_A_PUPDR, 21); // PA10 Pull-down
 
     REG_SET_BIT(RCC_APB2ENR, 4); // USART1 clock enable
 
-    // GET_REG(USART1_BRR) = (/* mantissa */ 8 << 4) | (/* frac */ 11); // 115200 bps
+    GET_REG(USART1_BRR) = (/* mantissa */ 8 << 4) | (/* frac */ 11); // 115200 bps
     // GET_REG(USART1_BRR) = (/* mantissa */ 104 << 4) | (/* frac */ 3); // 9600 bps
-    GET_REG(USART1_BRR) = (/* mantissa */ 416 << 4) | (/* frac */ 11); // 2400 bps
+    // GET_REG(USART1_BRR) = (/* mantissa */ 416 << 4) | (/* frac */ 11); // 2400 bps
 
     REG_SET_BIT(USART1_CR1, 13); // USART1 enable
 
-    const char buf[] = "Hello, World!\r\n";
-    while (1)
-        uart_send(buf, sizeof(buf));
+    for (int i = 0; i < 100; i++)
+        uart_send(".", 1);
+    uart_send("\r\n", 2);
 
     while (1)
-        continue;
+    {
+        uart_error_t err;
+        char c;
+        uart_recv(&c, 1, &err);
 
-    // TODO: Generic interrupt enabling
-    REG_CLR_BIT(SYSCFG_EXTICR1, 0);
-    REG_SET_BIT(EXTI_IMR, 0);
-    REG_SET_BIT(EXTI_FTSR, 0);
-    REG_SET_BIT(EXTI_RTSR, 0);
+        if (err)
+        {
+            uart_send("\r\nERR!\r\n", 8);
+            break;
+        }
 
-    REG_SET_BIT(NVIC_ISER0, 6);
+        uart_send("-> ", 3);
+        uart_send(&c, 1);
+        uart_send("\r\n", 2);
+    }
 
-    __asm__ __volatile__ ("cpsie i");
+    return;
 
+    // FIXME: board.h: declare array with sectors
+    char *flash_sect_1 = (void *)0x08004000;
 
-    GPIO_ENABLE(G);
-    GPIO_SET_PIN_MODE(G, 13, GPIO_PIN_MODE_OUTPUT);
+    char *prog_dst = flash_sect_1;
 
-    on_interrupt(6, button_pressed);
+    // TODO: add timeout to recv
+    // if not timeout: recv program and reflash
+    // jump to flash_sect_1
 
-    while (1)
-        continue;
+    header_t header;
+    reflash_board_recv(&header, sizeof(header));
+
+    if (header.version != REFLASH_VERSION)
+        reflash_board_fatal("incomptaible versions (on board = " STR(REFLASH_VERSION) ")");
+
+    char buf[header.chunk_size];
+
+    for (size_t i = 0; i < header.prog_len / header.chunk_size; i++)
+    {
+        reflash_board_recv(&buf, sizeof(buf));
+        flash_write(prog_dst, buf, sizeof(buf));
+
+        prog_dst += sizeof(buf);
+    }
+
+    size_t extra = header.prog_len % header.chunk_size;
+    if (extra != 0)
+    {
+        reflash_board_recv(&buf, extra);
+        flash_write(prog_dst, buf, extra);
+    }
 }
