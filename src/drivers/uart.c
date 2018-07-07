@@ -4,7 +4,7 @@
 #include "uart.h"
 
 
-size_t uart_recv(char *buf, size_t max, uint8_t *error)
+size_t uart_recv(char *buf, size_t max, uart_error_t *error)
 {
     size_t n = 0;
 
@@ -18,7 +18,7 @@ size_t uart_recv(char *buf, size_t max, uint8_t *error)
         while (!REG_GET_BIT(USART1_SR, 5)) // RXNE: Read data register not empty
             continue;
 
-        *(buf)++ = GET_REG(USART1_DR);
+        *(buf++) = GET_REG(USART1_DR);
 
         uint32_t status = GET_REG(USART1_SR);
 

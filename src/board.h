@@ -13,7 +13,7 @@
         extern volatile uint32_t *REG_NAME(Name)
 
 #define DEFINE_REGISTER(Name, Base, Offset) \
-        volatile uint32_t *REG_NAME(Name) = (uint32_t *)(Base + Offset)
+        volatile uint32_t *REG_NAME(Name) = (uint32_t *)((Base) + (Offset))
 
 #define GET_REGISTER(Name) *(REG_NAME(Name))
 #define GET_REG(Name) GET_REGISTER(Name)

@@ -10,5 +10,5 @@ typedef enum
     UART_ERR_OVERRUN,
 } uart_error_t;
 
-size_t uart_recv(char *buf, size_t max, uint8_t *error);
+size_t uart_recv(char *buf, size_t max, uart_error_t *error);
 void uart_send(const char *buf, size_t n);

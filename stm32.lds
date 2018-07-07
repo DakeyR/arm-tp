@@ -17,6 +17,8 @@ PROVIDE(heap_size = 1024);
 _stack_start = ORIGIN(ram) + LENGTH(ram);
 _stack_end = _stack_start - stack_size;
 
+PROVIDE(_flash_start = ORIGIN(flash));
+PROVIDE(_flash_end = ORIGIN(flash) + LENGTH(flash));
 
 SECTIONS {
   .sp : {
@@ -33,7 +35,7 @@ SECTIONS {
 
   .text : {
     . = ALIGN(4);
-    *(.text.*)
+    *(.text.*);
     . = ALIGN(4);
   } > flash
 

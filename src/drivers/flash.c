@@ -23,7 +23,7 @@ void flash_erase(unsigned char sector)
 
     // See SNB: Ref Man 3.9.8 (page 106)
     if (sector >= 12)
-        sector += 4;
+        sector |= (1 << 4);
 
     REG_PUT_BITS(FLASH_CR, 3, 7, sector); // SNB
     REG_SET_BIT(FLASH_CR, 1); // SER: Sector Erase
