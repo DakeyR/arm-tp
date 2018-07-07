@@ -22,7 +22,7 @@ LDFLAGS += -gc-sections # -print-gc-sections
 all: stm32.bin
 
 clean:
-	$(RM) $(OBJS) stm32.out
+	$(RM) $(OBJS) stm32.bin stm32.elf
 
 flash: stm32.bin
 	st-flash write $< 0x08000000
@@ -50,6 +50,8 @@ ifeq ($(wildcard $(SRC)),)
 SRC = $(shell find $(PAYLOAD_DIR)/src -name '*.c')
 endif
 
+SRC += src/start.c
+
 OBJS = $(SRC:.c=.o)
 
 PAYLOAD_BIN = $(PAYLOAD_DIR)/$(PAYLOAD).bin
@@ -61,6 +63,7 @@ CPPFLAGS = -I src
 CFLAGS = -mcpu=cortex-m4 -nostartfiles -static -g
 LDFLAGS = -T payload.lds
 
+CFLAGS += -fpic -mpic-data-is-text-relative
 
 payload_all: $(PAYLOAD_BIN)
 
