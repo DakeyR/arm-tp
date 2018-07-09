@@ -25,7 +25,7 @@ static
 void handle_exception(irq_num_t n, const char *name)
 {
     for (;;)
-        continue;
+        asm volatile ("wfi");
 }
 
 

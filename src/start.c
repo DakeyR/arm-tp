@@ -24,5 +24,5 @@ void start(void)
 
 
     for (;;)
-        continue;
+        asm volatile ("wfi");
 }
