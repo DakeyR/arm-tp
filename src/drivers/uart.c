@@ -4,7 +4,7 @@
 #include "uart.h"
 
 
-size_t uart_recv(char *buf, size_t max, uart_error_t *error)
+size_t uart_recv(char *buf, size_t max, size_t timeout, uart_error_t *error)
 {
     size_t n = 0;
 
@@ -16,7 +16,14 @@ size_t uart_recv(char *buf, size_t max, uart_error_t *error)
     for (; n < max; n++)
     {
         while (!REG_GET_BIT(USART1_SR, 5)) // RXNE: Read data register not empty
-            continue;
+        {
+            if (--timeout)
+                continue;
+
+            *error = UART_ERR_TIMEOUT;
+            goto end;
+        }
+
 
         *(buf++) = GET_REG(USART1_DR);
 
@@ -41,6 +48,7 @@ size_t uart_recv(char *buf, size_t max, uart_error_t *error)
         }
     }
 
+end:
     REG_CLR_BIT(USART1_CR1, 2); // RE
 
     return n;
